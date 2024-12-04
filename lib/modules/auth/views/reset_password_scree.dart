@@ -23,7 +23,7 @@ class ResetPasswordScreen extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+    backgroundColor: backgroundAppColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

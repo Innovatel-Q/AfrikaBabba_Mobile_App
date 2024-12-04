@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:afrika_baba/shared/no_connection_srenn.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get/get.dart';
@@ -7,8 +6,6 @@ import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 
 class ConnectivityController extends GetxController {
-
-
 
   // instance de la classe Connectivity
   final Connectivity _connectivity = Connectivity();
@@ -35,8 +32,6 @@ class ConnectivityController extends GetxController {
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) => _updateConnectionStatus(result));
     _internetCheckerSubscription = _internetChecker.onStatusChange.listen(_updateInternetStatus);
   }
-
-
 
   Future<void> _initConnectivity() async {
     try {

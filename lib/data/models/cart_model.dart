@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final cartModel = cartModelFromJson(jsonString);
-
 import 'dart:convert';
 
 import 'package:afrika_baba/data/models/product_model.dart';

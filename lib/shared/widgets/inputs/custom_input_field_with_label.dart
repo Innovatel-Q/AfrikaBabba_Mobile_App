@@ -8,25 +8,43 @@ class CustomInputFieldWithLabel extends StatelessWidget {
   final bool obscureText;
   final String label;
   final TextEditingController? controller;
-  final String? Function(String?)? validator; 
+  final String? Function(String?)? validator;
+  final IconData? prefixIcon;
 
-  CustomInputFieldWithLabel ({required this.hintText, this.obscureText = false, required this.label, this.controller, this.validator});
+  const CustomInputFieldWithLabel({
+    super.key,
+    required this.hintText,
+    this.obscureText = false,
+    required this.label,
+    this.controller,
+    this.validator,
+    this.prefixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final textScale = size.width / 375;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: GoogleFonts.poppins(
-            fontSize: 16,
+            fontSize: 15 * textScale,
             color: textColor,
             fontWeight: FontWeight.w500,
+            height: 1.5,
           ),
         ),
-        const SizedBox(height: 10),
-        CustomInputField(hintText: hintText, obscureText: obscureText, controller: controller, validator: validator,),
+        SizedBox(height: size.height * 0.01),
+        CustomInputField(
+          hintText: hintText,
+          obscureText: obscureText,
+          controller: controller,
+          validator: validator,
+        ),
       ],
     );
   }

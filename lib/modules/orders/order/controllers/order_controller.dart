@@ -17,10 +17,11 @@ class OrderController extends GetxController {
   RxList<Order> myOrdersRejected = <Order>[].obs;
   RxList<Order> myOrdersCanceled = <Order>[].obs;
   RxList<Order> myOrdersInProgress = <Order>[].obs;
-
+  RxList<Order> myOrdersViews = <Order>[].obs;
+  final RxBool isLoadingCreate = false.obs;
   Rx<String> selectedFilter = ''.obs;
 
-  // Utiliser une énumération pour les modes de livraison
+
   // ignore: constant_identifier_names
   static const int DELIVERY_MODE_AIR = 1;
   // ignore: constant_identifier_names
@@ -35,14 +36,24 @@ class OrderController extends GetxController {
   Rx<double> totalDeliveryCost = 0.0.obs;
   Rx<int> deliveryMode = DELIVERY_MODE_SEA.obs;
 
+  List<Order> get myOrders {
+    return [
+      ...myOrdersPending,
+      ...myOrdersDelivered,
+      ...myOrdersRejected,
+      ...myOrdersCanceled,
+      ...myOrdersInProgress
+    ];
+  }
+  
   @override
   void onInit() {
     super.onInit();
     getMyOrders();
-    getDeliveryCost().then((_) {
-      updateTotalOrder(DELIVERY_MODE_SEA);
-    });
-    // getDeliveryBatch();
+    initializeOrderTotals();
+    updateTotalOrder(1);
+    getDeliveryCost();
+    getTotalWeight();
   }
 
   OrderController({required this.orderApiProvider});
@@ -66,12 +77,24 @@ class OrderController extends GetxController {
   }
 
   double getTotalCostOrder() {
-    return cartController.product_cart.fold(
+    try {
+      return cartController.product_cart.fold(
         0.0,
-        (sum, element) =>
-            sum +
-            ((element.product.productWeight * element.quantity.value) *
-              double.parse(element.product.shop.fraisInterne)));
+        (sum, element) {
+          double fraisInternes = 0.0;
+          try {
+            fraisInternes = double.parse(element.product.shop.fraisInterne);
+          } catch (e) {
+            print('Erreur de conversion des frais internes: ${e.toString()}');
+          }
+
+          return sum + ((element.product.productWeight * element.quantity.value) * fraisInternes);
+        }
+      );
+    } catch (e) {
+      print('Erreur dans le calcul du coût total: ${e.toString()}');
+      return 0.0;
+    }
   }
   
   double getTotalPrice() {
@@ -85,40 +108,23 @@ class OrderController extends GetxController {
   double getTotalWeight() {
     return cartController.product_cart.fold(
         0.0,
-        (sum, element) =>
-            sum + (element.quantity.value * element.product.productWeight));
+        (sum, element) {
+          double productWeight = element.product.productWeight;
+          int quantity = element.quantity.value;
+          double subTotal = productWeight * quantity;  
+          return sum + subTotal;
+        });
   }
 
-  // Future<void> getDeliveryBatch() async {
-  //   final user = localStorageProvider.getUser();
-  //   if (user == null) {
-  //     if (kDebugMode) {
-  //       print('User not found');
-  //     }
-  //     return;
-  //   }
-  //   try {
-  //     final response = await orderApiProvider.getDeliveryBatch(
-  //       country: user.country,
-  //       deliveryMethod: deliveryMode.value == DELIVERY_MODE_AIR ? "AIR" : "SEA"
-  //     );
-  //     if (response != null && response.data['data'] is Map<String, dynamic>) {
-  //       deliveryBatchesResponse.value =  DeliveryBatchesResponse.fromJson(response.data['data']);
-  //     } else {
-  //       print('Unexpected response format for delivery batch');
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching delivery batch: $e');
-  //   }
-  // }
-
   void updateTotalOrder(int mode) {
-    if (deliveryCostModel.value == null){
+    if (deliveryCostModel.value == null) {
       return;
     }
     deliveryMode.value = mode;
     totalDeliveryCost.value = getTotalWeight() * 
-    (mode == DELIVERY_MODE_AIR ? deliveryCostModel.value?.costAir ?? 0 : deliveryCostModel.value?.costSea ?? 0);
+      (mode == DELIVERY_MODE_AIR ? 
+        deliveryCostModel.value?.costAir ?? 0 : 
+        deliveryCostModel.value?.costSea ?? 0);
     totalOrder.value = (getTotalCostOrder() + getTotalPrice()).toDouble();
   }
 
@@ -130,51 +136,92 @@ class OrderController extends GetxController {
             'price': e.product.price,
             'frais_interne': e.product.productWeight * e.quantity.value * double.parse(e.product.shop.fraisInterne)
         }).toList();
-
+      isLoadingCreate.value = true;
+      // Calculer le montant total final (commande + livraison)
+      final finalTotalAmount = totalOrder.value + totalDeliveryCost.value;
+      
       final response = await orderApiProvider.createOrder(
         deliveryMethod: deliveryMode.value.toString(),
         deliveryCost: totalDeliveryCost.value.toString(),
-        totalPrice: totalOrder.value.toString(),
+        totalPrice: finalTotalAmount.toString(), // Utiliser le montant total final
         orderItems: orderItems
       );
-      if (response?.statusCode == 200 && response?.data != null) {
+      if (response?.data != null) {
+        getMyOrders();
+        isLoadingCreate.value = false;
         Get.toNamed(AppRoutes.PAYMENT_CONFIRMATION_SCREEN);
+        cartController.clearCart();
       } else {
         print('Unexpected response format for order creation');
       }
+      isLoadingCreate.value = false;
     } catch (e) {
       print('Error creating order: $e');
+      isLoadingCreate.value = false;
     }
   }
-
 
   Future<void> getMyOrders({int page = 1}) async {
-  try {
+    try {
+      // Vide toutes les listes existantes
+      // Clears all existing lists
+      myOrdersPending.clear();
+      myOrdersDelivered.clear();
+      myOrdersRejected.clear();
+      myOrdersCanceled.clear();
+      myOrdersInProgress.clear();
 
-    final response = await orderApiProvider.getMyOrders(page: page);
-  
-    if (response?.statusCode == 200 && response?.data != null) {
-    
-      MyOrderResponse myOrderResponse = MyOrderResponse.fromJson(response?.data); 
- 
-      myOrdersPending.addAll(myOrderResponse.orders.where((order) => order.status == 'PENDING'));
-      myOrdersDelivered.addAll(myOrderResponse.orders.where((order) => order.status == 'DELIVERED'));
-      myOrdersRejected.addAll(myOrderResponse.orders.where((order) => order.status == 'REJECTED'));
-      myOrdersCanceled.addAll(myOrderResponse.orders.where((order) => order.status == 'CANCELED'));
-      myOrdersInProgress.addAll(myOrderResponse.orders.where((order) => order.status == 'IN_PROGRESS'));
-    } else {
+      // Fait l'appel API pour récupérer les commandes
+      // Makes API call to fetch orders
+
+      final response = await orderApiProvider.getMyOrders(page: page);
+      
+      if (response?.statusCode == 200 && response?.data != null) {
+
+        // Convertit la réponse en objet MyOrderResponse
+        // Converts response to MyOrderResponse object
+
+        MyOrderResponse myOrderResponse = MyOrderResponse.fromJson(response?.data); 
+
+        // Trie les commandes selon leur statut
+        // Sorts orders by their status
+
+        myOrdersPending.addAll(myOrderResponse.orders.where(
+          (order) => order.status == 'PENDING' && order.deletedAt == null
+        ));
+        myOrdersDelivered.addAll(myOrderResponse.orders.where(
+          (order) => order.status == 'DELIVERED' && order.deletedAt == null
+        ));
+        myOrdersRejected.addAll(myOrderResponse.orders.where(
+          (order) => order.status == 'REJECTED' && order.deletedAt == null
+        ));
+        myOrdersCanceled.addAll(myOrderResponse.orders.where(
+          (order) => order.status == 'CANCELED' && order.deletedAt == null
+        ));
+        myOrdersInProgress.addAll(myOrderResponse.orders.where(
+          (order) => order.status == 'IN_PROGRESS' && order.deletedAt == null
+        ));
+
+      } else {
+        if (kDebugMode) {
+          print('Erreur lors de la récupération des commandes : ${response?.statusCode}');
+        }
+      }
+    } catch (e) {
       if (kDebugMode) {
-        print('Erreur lors de la récupération des commandes : ${response?.statusCode}');
+        print('orders : $e');
       }
     }
-  } catch (e) {
-    if (kDebugMode) {
-      print('orders : $e');
-    }
+  }
+
+  void initializeOrderTotals() async {
+    await getDeliveryCost();
+    totalOrder.value = (getTotalCostOrder() + getTotalPrice()).toDouble();
+    totalDeliveryCost.value = getTotalWeight() * 
+      (deliveryMode.value == DELIVERY_MODE_AIR ? 
+        deliveryCostModel.value?.costAir ?? 0 : 
+        deliveryCostModel.value?.costSea ?? 0);
   }
 }
 
-  Future<String> generatePaymentLink(String paymentMethod) async {
-    return '';
-  }
-}
+

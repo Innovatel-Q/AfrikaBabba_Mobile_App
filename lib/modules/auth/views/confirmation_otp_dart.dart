@@ -83,7 +83,7 @@ class ConfirmationOtpDart extends StatelessWidget {
                   text: 'Envoyez',
                   color: btnColorFourth,
                   onPressed: () {
-                    Get.offAll(() => NewPasswordScreen());
+                    Get.offAll(() => const NewPasswordScreen());
                   },
                 ),
               ],

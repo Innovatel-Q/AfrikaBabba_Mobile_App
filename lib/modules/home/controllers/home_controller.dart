@@ -1,12 +1,13 @@
 import 'package:afrika_baba/data/models/product_model.dart';
-import 'package:afrika_baba/modules/home/views/detail_product.dart';
 import 'package:afrika_baba/modules/home/views/seach_result_page.dart';
 import 'package:afrika_baba/providers/local_storage_provider.dart';
-import 'package:afrika_baba/providers/product_api_provider.dart'; 
+import 'package:afrika_baba/providers/product_api_provider.dart';
+import 'package:afrika_baba/routes/app_routes.dart'; 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
+  
   final ProductApiProvider productApiProvider;
   RxList<Product> products = <Product>[].obs;
   RxList<Category> categories = <Category>[].obs;
@@ -35,7 +36,8 @@ class HomeController extends GetxController {
   {
     final response = await productApiProvider.getProductById(productId);
     if (response?.statusCode == 200 && response?.data != null) {
-      return Product.fromJson(response?.data['data']).mainImageUrl;
+      final product = Product.fromJson(response?.data['data']);
+      return product.productMedia.isNotEmpty ? product.productMedia[0].mediaUrl : null;
     } else {
       print('Erreur lors de la récupération du produit : ${response?.statusCode}');
       return null;
@@ -54,13 +56,11 @@ class HomeController extends GetxController {
   Future<void> getProducts() async {
     try {
       isLoading.value = true;
-      initialLoading.value = true;
       final response = await productApiProvider.getProducts(page: 1);
       if (response?.statusCode == 200 && response?.data != null) {
         products.clear();
         products.addAll((response?.data['data'] as List)
             .map((element) => Product.fromJson(element)));
-        print('Produits récupérés avec succès ${products.length}');
       } else {
         print('Erreur : ${response?.statusCode}');
       }
@@ -68,7 +68,7 @@ class HomeController extends GetxController {
       print("Erreur lors de la récupération des produits : $e");
     } finally {
       isLoading.value = false;
-      initialLoading.value = false;
+      // initialLoading.value = false;
     }
   }
 
@@ -85,27 +85,27 @@ class HomeController extends GetxController {
   }
 
   Future<List<Product>> loadMoreProducts({int page = 1}) async {
-    try {
-      isLoading.value = true;
-      final response = await productApiProvider.getProducts(page: page);
-      if (response?.statusCode == 200 && response?.data != null) {
-        List<Product> newProducts = (response?.data['data'] as List)
-            .map((element) => Product.fromJson(element))
-            .toList();
-        return newProducts;
-      }
-      return [];
-    } catch (e) {
-      print("Erreur lors du chargement des produits : $e");
-      return [];
-    } finally {
+  try {
+     isLoading.value = true;
+    final response = await productApiProvider.getProducts(page: page);
+    if (response?.statusCode == 200 && response?.data != null) {
       isLoading.value = false;
+      return (response?.data['data'] as List)
+          .map((element) => Product.fromJson(element))
+          .toList();
     }
+    return [];
+  } catch (e) {
+    isLoading.value = false;
+    print("Erreur lors du chargement des produits : $e");
+    return [];
   }
+}
+
 
   Future<List<Product>> loadMoreProductsForSearch(String? name, int? category, {int page = 1}) async {
     try {
-      isLoading.value = true;
+      // isLoading.value = true;
       final response =
           await productApiProvider.searchProduct(name, category, page: page);
       if (response?.statusCode == 200 && response?.data != null) {
@@ -117,7 +117,7 @@ class HomeController extends GetxController {
     } catch (e) {
       print("Erreur lors du chargement des produits : $e");
     } finally {
-      isLoading.value = false;
+      // isLoading.value = false;
     }
     return [];
   }
@@ -204,7 +204,7 @@ class HomeController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-      Get.offAll(() => DetailProduct(product: product));
+      Get.toNamed(AppRoutes.PRODUCT_DETAIL, arguments: product);
     } else {
       print('Données de réponse invalides');
     }
@@ -220,7 +220,6 @@ class HomeController extends GetxController {
       print('Erreur lors de la modification du commentaire');
     }
   }
-
   Future<void> deleteComment(int commentId, int productId) async {
     final response = await productApiProvider.deleteComment(commentId);
     if (response?.statusCode == 204){

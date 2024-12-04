@@ -1,13 +1,15 @@
 
 import 'package:afrika_baba/providers/api_provider.dart';
 import 'package:afrika_baba/providers/local_storage_provider.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
+import 'package:get/get.dart';
+
 class OrderApiProvider{
 
-  ApiProvider apiProvider = ApiProvider();
+  final ApiProvider apiProvider = Get.find<ApiProvider>();
   
 
-  Future<Response?> getDeliveryCost() async {
+  Future<dio.Response?> getDeliveryCost() async {
     try {
       final response = await apiProvider.dio.get('/delivery_costs');
       return response;
@@ -18,7 +20,7 @@ class OrderApiProvider{
 
  
 
-  Future<Response?> createOrder({
+  Future<dio.Response?> createOrder({
     required String deliveryMethod,
     required String deliveryCost,
     required String totalPrice,
@@ -37,7 +39,7 @@ class OrderApiProvider{
     }
   }
 
-  Future<Response?> getMyOrders({int page = 1}) async {
+  Future<dio.Response?> getMyOrders({int page = 1}) async {
     try {
       final userId =  LocalStorageProvider().getUser()!.id;
       final response = await apiProvider.dio.get('/orders', queryParameters: {
@@ -51,7 +53,7 @@ class OrderApiProvider{
   }
 
 
-  Future<Response?> getDeliveryBatch({required String country, required String deliveryMethod}) async {
+  Future<dio.Response?> getDeliveryBatch({required String country, required String deliveryMethod}) async {
     try {
       final response = await apiProvider.dio.post(
         '/delivery-batches/last',
@@ -66,7 +68,7 @@ class OrderApiProvider{
     }
   }
 
-  Future<Response?> createOrderItem({
+  Future<dio.Response?> createOrderItem({
     required List<Map<String, dynamic>> orderItems,
   }) async {
     try {

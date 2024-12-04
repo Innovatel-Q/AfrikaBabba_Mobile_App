@@ -4,12 +4,14 @@ import 'package:afrika_baba/providers/local_storage_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:http/http.dart' as http;
 
-class AuthApiProvider {
+class AuthApiProvider{
+
   final ApiProvider apiProvider = ApiProvider();
-  final String baseUrl = 'https://afrikababaa-571dedf1e98c.herokuapp.com/api';
+  final String baseUrl = dotenv.env['API_URL_PROD'] ?? '';
 
   final LocalStorageProvider localStorage = Get.find<LocalStorageProvider>();
 
@@ -61,50 +63,47 @@ class AuthApiProvider {
         return response;  
       } else {
         throw Exception(
-            'Erreur lors de la création de l\'utilisateur : ${response.data}');
+        'Erreur lors de la création de l\'utilisateur : ${response.data}');
       }
     } on DioException catch (e) {
-      print(e.response?.data);
-      print(e.response?.statusCode);
-      if (e.response?.statusCode == 400) {
-        if (e.response?.data is String) {
-          try {
-            final errorData = json.decode(e.response?.data as String) as Map<String, dynamic>;
-            final errorMessages = <String>[];
-            
-            if (errorData.containsKey('phone_number')) {
-              errorMessages.add('ce numéro de téléphone est déjà utilisé');
-            }
-            if (errorData.containsKey('email')) {
-              errorMessages.add("cet email est déjà utilisé");
-            }
-            
-            final errorMessage = errorMessages.join('\n');
-            
-            Get.snackbar(
-              'Erreur',
-              errorMessage,
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 5),
-            );
-          } catch (jsonError) {
-            print('Erreur lors du parsing JSON: $jsonError');
-            Get.snackbar(
-              'Erreur',
-              'Une erreur est survenue lors de l\'inscription',
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-            );
-          }
-        } else {
+      if (e.response != null) {
+        final Map<String, dynamic> errors = e.response?.data is String 
+            ? json.decode(e.response?.data) 
+            : e.response?.data;
+        
+        if (errors.containsKey('phone_number')) {
           Get.snackbar(
-            'Erreur',
-            'Une erreur inattendue est survenue',
+            'Oups',
+            'Ce numéro de téléphone est déjà utilisé',
             backgroundColor: Colors.red,
             colorText: Colors.white,
           );
         }
+        
+        if (errors.containsKey('email')) {
+          Get.snackbar(
+            'Oups',
+            'Cette adresse email est déjà utilisée',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+
+        if (errors.containsKey('country')) {
+          Get.snackbar(
+            'Oups',
+            'Ce pays n\'est pas valide',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+        }
+      } else {
+        Get.snackbar(
+          'Oups',
+          'Une erreur est survenue lors de l\'inscription',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
       return null;
     }
@@ -127,10 +126,11 @@ class AuthApiProvider {
     }
   }
 
-  Future<Map<String, dynamic>> updateAddress(String address, String phoneNumber) async {
+  Future<Map<String, dynamic>> updateAddress(String address, String phoneNumber,String country) async {
     final response = await apiProvider.dio.post("/users/update/${localStorage.getUser()?.id}", data: {
       "adresse": address,
       "phone_number": phoneNumber,
+      "country": country,
     });
     if (response.statusCode == 200) {
       return response.data;
@@ -141,7 +141,6 @@ class AuthApiProvider {
   }
 
   
-
   Future<http.StreamedResponse?> uploadImage({required String filepath}) async {
     try {
       var request = http.MultipartRequest('POST',
@@ -197,9 +196,9 @@ class AuthApiProvider {
           'new_password_confirmation': confirmPassword,
         },
       );
-      return response; // Retourne la réponse en cas de succès
+      return response;
     } on DioException catch (e) {
-      // Gestion spécifique des erreurs Dio
+
       if (e.response != null) {
         print(
             'Erreur de réponse Dio: ${e.response?.statusCode} - ${e.response?.data}');
@@ -207,11 +206,10 @@ class AuthApiProvider {
         print('Erreur Dio sans réponse : ${e.message}');
       }
       return e
-          .response; // Retourne la réponse pour que l'appelant puisse la gérer
+          .response;
     } catch (e) {
-      // Gestion des autres erreurs
       print('Erreur inattendue : $e');
-      return null; // Retourne null en cas d'erreur inattendue
+      return null;
     }
   }
 }

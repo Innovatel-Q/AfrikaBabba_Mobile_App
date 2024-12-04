@@ -2,10 +2,16 @@ import 'package:afrika_baba/modules/auth/bindings/auth_binding.dart';
 import 'package:afrika_baba/modules/auth/views/login_first.dart';
 import 'package:afrika_baba/modules/auth/views/login_screen.dart';
 import 'package:afrika_baba/modules/auth/views/signup_screen.dart';
+import 'package:afrika_baba/modules/chats/bindings/chat_binding.dart';
+import 'package:afrika_baba/modules/chats/views/chat_detail_screen.dart';
 import 'package:afrika_baba/modules/chats/views/chats_screen.dart';
 import 'package:afrika_baba/modules/home/bindings/home_binding.dart';
+import 'package:afrika_baba/modules/home/views/comment_product_screen.dart';
+import 'package:afrika_baba/modules/home/views/detail_product.dart';
 import 'package:afrika_baba/modules/home/views/home_page.dart';
+import 'package:afrika_baba/modules/home/views/search_product.dart';
 import 'package:afrika_baba/modules/home/views/start_screnn.dart';
+import 'package:afrika_baba/modules/home/views/all_product_screen.dart';
 import 'package:afrika_baba/modules/orders/cart/bindings/cart_binding.dart';
 import 'package:afrika_baba/modules/orders/cart/views/cart_screen.dart';
 import 'package:afrika_baba/modules/orders/cart/views/delyvery_mode_screen.dart';
@@ -18,24 +24,27 @@ import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/no_connection_srenn.dart';
 import 'package:get/get.dart';
 
+import '../modules/user/views/delivery_address.dart';
+
 class AppPages {
   static final List<GetPage> pages = [
     GetPage(
       name: AppRoutes.INITIAL,
       page: () => const StartPage(),  
-      binding: AuthBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.CHAT_SCREEN,
-      page: () => ChatScreen(),
       bindings: [
-        HomeBinding(),
         AuthBinding(),
       ],
     ),
     GetPage(
+      name: AppRoutes.CHAT_SCREEN,
+      page: () => const ChatScreen(),
+      bindings: [
+        ChatBinding(),
+      ],
+    ),
+    GetPage(
       name: AppRoutes.HOME,
-      page: () =>  HomePage(),
+      page: () =>  const HomePage(),
       bindings: [
         HomeBinding(),
         AuthBinding(),
@@ -44,17 +53,23 @@ class AppPages {
     GetPage(
       name: AppRoutes.FIRSTLOGIN,
        page: () =>  LoginFirstScreen(),
-       binding: AuthBinding()
+       bindings:[
+         AuthBinding()
+       ]
     ),
     GetPage(
       name: AppRoutes.LOGIN,
        page: () => LoginScreen(), 
-       binding: AuthBinding()
+       bindings: [
+         AuthBinding()
+       ]
     ),
     GetPage(
       name: AppRoutes.SIGNUP, 
       page: () => const SignUpScreen(), 
-      binding: AuthBinding()
+      bindings: [
+        AuthBinding()
+      ]
     ),
     GetPage(
       name: AppRoutes.PROFILE,
@@ -67,16 +82,20 @@ class AppPages {
     GetPage(
       name: AppRoutes.PAY_SCREEN,
       page: () => CartScreen(),
-      binding: CartBinding(),
+      bindings:[
+        CartBinding()
+      ],
     ),
     GetPage(
       name: AppRoutes.EDITE_PROFILE,
       page: () => InformationPersonel(),
-      binding: UserBinding(),
+      bindings:[
+        UserBinding()
+      ],
     ),
     GetPage(
       name: AppRoutes.DELIVERY_METHOD,
-      binding: OrderBinding(),
+      bindings: [OrderBinding()],
       page: ()=> DeliveryModeScreen()
      ),
      GetPage(
@@ -94,6 +113,54 @@ class AppPages {
         CartBinding(),
         OrderBinding(),
       ],
-     )
+     ),
+     GetPage(
+      name: AppRoutes.CHAT_DETAIL_SCREEN,
+      page: () => ChatDetailScreen(conversationId: Get.arguments),
+      bindings: [
+        ChatBinding()
+      ],
+     ),
+     GetPage(
+      name: AppRoutes.PRODUCT_DETAIL,
+      page: () => DetailProduct(product: Get.arguments),
+      bindings: [
+        HomeBinding(),
+        ChatBinding(),
+      ],
+     ),
+     GetPage(
+      name: AppRoutes.SEARCH ,
+      page: () => const SearchProduct(),
+      bindings: [
+        HomeBinding(),
+        AuthBinding()
+      ]
+
+    ),
+    GetPage(
+      name: AppRoutes.ALL_PRODUCT,
+      page: () => const AllProductScreen(),
+      bindings: [
+        HomeBinding(),
+        AuthBinding()
+      ]
+    ),
+    GetPage(
+        name: AppRoutes.DELIVERY_ADRESS_SCREEN,
+        page: () =>  DeliveryAddressScreen(),
+        bindings: [
+         HomeBinding(),
+         AuthBinding()
+        ]
+    ),
+    GetPage(
+      name: AppRoutes.COMMENT_PRODUCT_SCREEN,
+      page: () => AddCommentScreen(product: Get.arguments),
+      bindings: [
+        HomeBinding(),
+        AuthBinding()
+      ],
+    ),
   ];
 }

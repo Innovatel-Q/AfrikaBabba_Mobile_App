@@ -1,4 +1,3 @@
-
 import 'package:afrika_baba/modules/auth/controllers/auth_controller.dart';
 import 'package:afrika_baba/modules/user/controllers/user_controller.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
@@ -10,23 +9,22 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class InformationPersonel extends StatelessWidget {
+class InformationPersonel extends GetView<AuthController> {
 
   final _formKey = GlobalKey<FormState>();
   final TextEditingController firstnameController = TextEditingController();
   final TextEditingController lastnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  final AuthController authController = Get.find<AuthController>();
 
   InformationPersonel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    firstnameController.text = authController.userData.value?.firstname ?? '';
-    lastnameController.text = authController.userData.value?.lastname ?? '';
-    emailController.text = authController.userData.value?.email ?? '';
-    phoneController.text = authController.userData.value?.phoneNumber ?? '';
+    firstnameController.text = controller.userData.value?.firstname ?? '';
+    lastnameController.text = controller.userData.value?.lastname ?? '';
+    emailController.text = controller.userData.value?.email ?? '';
+    phoneController.text = controller.userData.value?.phoneNumber ?? '';
     final UserController userController = Get.find<UserController>();
 
     return Scaffold(
@@ -49,7 +47,7 @@ class InformationPersonel extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.grey[200],
+      backgroundColor: backgroundAppColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -62,15 +60,13 @@ class InformationPersonel extends StatelessWidget {
                   const SizedBox(height: 30),
                   CustomInputFieldWithLabel(hintText: 'Nom', label: 'Nom', controller: firstnameController,validator:Validators.validateRequired),
                   const SizedBox(height: 20),
-                  CustomInputFieldWithLabel(hintText: 'Prenom', label: 'Nom', controller: lastnameController,validator:Validators.validateRequired),
-                  const SizedBox(height: 20),
-                 
+                  CustomInputFieldWithLabel(hintText: 'Prenom', label: 'Prenom', controller: lastnameController,validator:Validators.validateRequired),
                   const SizedBox(height: 20),
                   CustomInputFieldWithLabel(hintText: 'Numéro mobile', label: 'Numéro mobile', controller: phoneController,validator:Validators.validatePhoneNumber),
                   const SizedBox(height: 30),
                   Obx((){ 
                     if (userController.isLoading.value) {
-                      return  const Center(child: SpinKitFadingCircle(
+                      return  const Center(child:SpinKitChasingDots(
                         color: btnColor,
                         size: 50.0,
                       ));

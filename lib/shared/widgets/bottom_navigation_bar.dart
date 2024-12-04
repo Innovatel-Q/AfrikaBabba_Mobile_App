@@ -1,6 +1,5 @@
 import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
-import 'package:afrika_baba/modules/home/views/search_product.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -61,7 +60,7 @@ Widget build(BuildContext context) {
                   Get.toNamed(AppRoutes.PAY_SCREEN);
                   break;
                 case 3:
-                  Get.to(const SearchProduct());
+                  Get.toNamed(AppRoutes.SEARCH);
                   break;
                 case 4:
                   Get.toNamed(AppRoutes.PROFILE);

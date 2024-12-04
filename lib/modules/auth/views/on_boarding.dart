@@ -1,5 +1,5 @@
+import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
-import 'package:afrika_baba/modules/auth/views/login_first.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:swipeable_button_view/swipeable_button_view.dart';
@@ -88,10 +88,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       });
                     });
                   },
-                  onFinish: () async
-                   {
-                    await Get.offAll(() =>  LoginFirstScreen());
-                   },
+                  onFinish: () async {
+                    await Get.offAllNamed(AppRoutes.FIRSTLOGIN);
+                  },
                 ),
               ),
               const SizedBox(height: 40),

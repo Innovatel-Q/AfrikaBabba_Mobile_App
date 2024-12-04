@@ -17,8 +17,30 @@ class UserController extends GetxController {
   final ImagePicker _picker = ImagePicker();  
   var imagePath = ''.obs;
   var isLoading = false.obs;
+  final RxString selectedCountry = "".obs;
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController countryController = TextEditingController();
 
   UserController({required this.apiProvider});
+
+  @override
+  void onInit() {
+    super.onInit();
+    _initializeFormValues();
+    
+    ever(authController.userData, (_) {
+      _initializeFormValues();
+    });
+  }
+
+  void _initializeFormValues() {
+    if (authController.userData.value != null) {
+      selectedCountry.value = authController.userData.value?.country ?? '';
+      addressController.text = authController.userData.value?.address ?? '';
+      phoneController.text = authController.userData.value?.phoneNumber ?? '';
+    }
+  }
 
   Future<void> selectImage() async {
     try {
@@ -89,41 +111,50 @@ class UserController extends GetxController {
     try {
       isLoading(true);
       final response = await apiProvider.updateUser(firstname, lastname, phoneNumber);
-      authController.userData(User.fromMap(response['data']));
-      localStorage.saveUser(User.fromMap(response['data']));
-      Get.snackbar("Modification réussie", "Vos informations personnelles ont été modifiées avec succès", backgroundColor: Colors.green, colorText: Colors.white);
-      isLoading(false);
+      if (response['data'] != null) {
+        final user = User.fromMap(response['data']);
+        authController.updateUserData(user);
+        Get.back();
+        Get.snackbar(
+        "Modification réussie", 
+        "Vos informations ont été modifiées avec succès",
+        backgroundColor: Colors.green,
+        colorText: Colors.white
+      );
+      }
+     
     } catch (e) {
-      isLoading(false);
       Get.snackbar(
         'Erreur',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    } finally {
+      isLoading(false);
     }
   }
-
-  Future<void> editAddress(String address, String phoneNumber) async {
+  Future<void> editAddress(String address, String phone, String country) async {
     try {
       isLoading(true);
-      final response = await apiProvider.updateAddress(address, phoneNumber);
-      print(response['data']);
-      authController.userData(User.fromMap(response['data']));
-      localStorage.saveUser(User.fromMap(response['data']));
-      isLoading(false);
-      Get.snackbar("Modification réussie", "Vos informations de livraison ont été modifiées avec succès", backgroundColor: Colors.green, colorText: Colors.white);
+      final response = await apiProvider.updateAddress(address, phone, country);
+      if (response['data'] != null) {
+        final user = User.fromMap(response['data']);
+        authController.updateUserData(user);
+        Get.back();
+        Get.snackbar(
+          'Succès',
+          'Adresse mise à jour avec succès',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
     } catch (e) {
+      Get.snackbar('Erreur', 'Impossible de modifier l\'adresse');
+    } finally {
       isLoading(false);
-      Get.snackbar(
-        'Erreur',
-        e.toString(),
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
     }
   }
-
   Future<void> resetPassword(String currentPassword, String newPassword, String confirmPassword) async {
     try {
       isLoading(true);

@@ -1,6 +1,7 @@
 
 import 'package:afrika_baba/modules/auth/views/forget_password_screen.dart';
 import 'package:afrika_baba/modules/home/views/home_page.dart';
+import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
 import 'package:afrika_baba/shared/widgets/DividerWithText.dart';
 import 'package:afrika_baba/shared/widgets/buttons/CustomButton.dart';
@@ -48,7 +49,7 @@ class LoginScreen extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: GestureDetector(   
                   onTap: () {
-                    Get.to(() => ForgetPasswordScreen());
+                    // Get.to(() => ForgetPasswordScreen());
                   },
                   child: const Text(
                     'Mot de passe oublié?',
@@ -63,7 +64,7 @@ class LoginScreen extends StatelessWidget {
               CustomButton(
                 text: 'Connexion',
                 onPressed: () {
-                  Get.to(() => HomePage());
+                  Get.toNamed(AppRoutes.HOME);
                 },
               ),
     

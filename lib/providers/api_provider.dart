@@ -1,12 +1,14 @@
 import 'package:afrika_baba/providers/local_storage_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 
 class ApiProvider {
   final LocalStorageProvider localStorage = Get.find<LocalStorageProvider>();
+
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: 'https://afrikababaa-571dedf1e98c.herokuapp.com/api',
+      baseUrl: dotenv.env['API_URL_PROD'] ?? '',
       connectTimeout: const Duration(seconds: 60),
       receiveTimeout: const Duration(seconds: 60),
       contentType: 'application/json',
@@ -14,8 +16,8 @@ class ApiProvider {
     ),
   );
 
-  bool _isRefreshingToken = false; // Flag pour éviter les multiples rafraîchissements
-  final List<void Function()> _refreshQueue = []; // Queue pour mettre en attente les requêtes
+  bool _isRefreshingToken = false;
+  final List<void Function()> _refreshQueue = [];
 
   ApiProvider() {
     dio.interceptors.add(
@@ -43,13 +45,11 @@ class ApiProvider {
     );
   }
 
-  // Gérer les erreurs 401 pour rafraîchir le token
   Future<void> _handle401Error(DioException error, ErrorInterceptorHandler handler) async {
     if (_isRefreshingToken) {
-      // Si le token est déjà en cours de rafraîchissement, ajoutez cette requête à la queue
       _refreshQueue.add(() => dio.fetch(error.requestOptions).then(
             handler.resolve,
-            onError: handler.next,
+            onError: (e, [stackTrace]) => handler.next(e),
           ));
       return;
     }
@@ -58,7 +58,6 @@ class ApiProvider {
     final newAccessToken = await refreshToken();
 
     if (newAccessToken != null) {
-      // Réessayer toutes les requêtes mises en attente dans la queue
       error.requestOptions.headers["Authorization"] = "Bearer $newAccessToken";
       for (var request in _refreshQueue) {
         request();
@@ -66,17 +65,14 @@ class ApiProvider {
       _refreshQueue.clear();
       handler.resolve(await dio.fetch(error.requestOptions));
     } else {
-      // En cas d'échec, déconnectez l'utilisateur ou redirigez vers la connexion
       _logoutUser();
       handler.next(error);
     }
     _isRefreshingToken = false;
   }
 
-  // Fonction pour rafraîchir le token
   Future<String?> refreshToken() async {
-    final refreshToken = await localStorage.getToken();
-    print('Rafraîchissement du token avec : $refreshToken');
+    final refreshToken = localStorage.getToken();
     try {
       final response = await dio.post(
         '/auth/refresh',
@@ -93,8 +89,9 @@ class ApiProvider {
         await localStorage.saveToken(newAccessToken);
         return newAccessToken;
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Erreur lors du rafraîchissement du token : $e');
+      print('StackTrace: $stackTrace');
     }
     return null;
   }

@@ -1,11 +1,13 @@
 import 'package:afrika_baba/data/models/user_model.dart' as AppUser;
 import 'package:afrika_baba/providers/auth_api_provider.dart';
 import 'package:afrika_baba/providers/local_storage_provider.dart';
+import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 
 class AuthController extends GetxController {
+  
   final AuthApiProvider authApiProvider;
   final LocalStorageProvider localStorage = Get.find<LocalStorageProvider>();
 
@@ -30,12 +32,12 @@ class AuthController extends GetxController {
       isLoading(true);
       authError('');
       final response = await authApiProvider.login(email, password);
-      if(response != null){
+      
+      if(response != null && response.data['user'] != null){
         localStorage.saveToken(response.data['access_token']);
         final user = AppUser.User.fromMap(response.data['user']);
-        userData(user);
-        localStorage.saveUser(user);
-        Get.offAllNamed('/home');
+        updateUserData(user);
+        Get.offAllNamed(AppRoutes.HOME);
       }  
       isLoading(false);
   }
@@ -58,7 +60,7 @@ class AuthController extends GetxController {
         password, passwordConfirmation, role, country);
     if (reponse != null) {
       Get.snackbar('Succès', 'Merci de valider votre email', backgroundColor: Colors.green, colorText: Colors.white,duration: const Duration(seconds: 3));
-      Get.offAllNamed('/firstlogin');
+      Get.offAllNamed(AppRoutes.FIRSTLOGIN);
     }
     isLoading(false);
   }
@@ -80,5 +82,11 @@ class AuthController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  void updateUserData(AppUser.User user) {
+    userData.value = user;
+    localStorage.saveUser(user);
+    update();
   }
 }

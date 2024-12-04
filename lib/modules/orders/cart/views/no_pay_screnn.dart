@@ -1,24 +1,25 @@
 import 'package:afrika_baba/modules/orders/cart/controllers/cart_controller.dart';
+import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
 import 'package:afrika_baba/shared/widgets/product_custom/build_card_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class NoPayScreen extends StatelessWidget {
+class NoPayScreen extends GetView<CartController> {
   
 
-  NoPayScreen({super.key});
+  const NoPayScreen({super.key});
   
 
   @override
   Widget build(BuildContext context) {
-     final cartController = Get.find<CartController>();
+
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     
     return Obx(() {
-      if (cartController.product_cart.isEmpty) {
+      if (controller.product_cart.isEmpty) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -50,7 +51,7 @@ class NoPayScreen extends StatelessWidget {
               SizedBox(height: height * 0.05),
               ElevatedButton(
                 onPressed: () {
-                  Get.back();
+                  Get.toNamed(AppRoutes.HOME);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: textgrennColor,
@@ -73,9 +74,9 @@ class NoPayScreen extends StatelessWidget {
         );
       } else {
         return ListView.builder(
-          itemCount: cartController.product_cart.length + 1,
+          itemCount: controller.product_cart.length + 1,
           itemBuilder: (context, index) {
-            if (index == cartController.product_cart.length) {
+            if (index == controller.product_cart.length) {
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: width * 0.05),
                 child: Column(
@@ -93,7 +94,7 @@ class NoPayScreen extends StatelessWidget {
                           ),
                         ),
                         Obx(() => Text(
-                          '${cartController.totalPrice} FCFA',
+                          '${controller.totalPrice} FCFA',
                           style: GoogleFonts.poppins(
                             fontSize: width * 0.03,
                             fontWeight: FontWeight.bold,
@@ -107,7 +108,7 @@ class NoPayScreen extends StatelessWidget {
                       width: width * 0.9,
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.toNamed('/delivery-method');  
+                          Get.toNamed(AppRoutes.DELIVERY_METHOD);  
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: textgrennColor,
@@ -129,12 +130,12 @@ class NoPayScreen extends StatelessWidget {
                 ),
               );
             } else {
-              final product = cartController.product_cart[index];
+              final product = controller.product_cart[index];
               return Dismissible(
                 key: Key(product.id.toString()),
                 direction: DismissDirection.endToStart,
                 onDismissed: (direction) {
-                  cartController.removeProduct(product);
+                  controller.removeProduct(product);
                 },
                 background: Container(
                   alignment: Alignment.centerRight,

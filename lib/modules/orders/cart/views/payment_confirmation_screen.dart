@@ -1,4 +1,5 @@
 import 'package:afrika_baba/modules/home/views/home_page.dart';
+import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,7 +10,6 @@ class PaymentConfirmationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
@@ -18,49 +18,86 @@ class PaymentConfirmationScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          onPressed: () {
-            Get.offAll(() =>  HomePage ());
-          },
+          onPressed: () => Get.toNamed(AppRoutes.HOME),
           icon: const Icon(Icons.arrow_back_ios_new_rounded,color: Colors.white,),
         ),
       ),
-      backgroundColor: btnColorFourth, 
-      body: Center(
+      backgroundColor: btnColorFourth,
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: width * 0.4,
-              height: width * 0.4,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.check,
-                color: Colors.green[600],
-                size: width * 0.2,
+            const Spacer(),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 800),
+              child: Hero(
+                tag: 'confirmation',
+                child: Container(
+                  width: width * 0.45,
+                  height: width * 0.45,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.green[600],
+                    size: width * 0.25,
+                  ),
+                ),
               ),
             ),
-            SizedBox(height: height * 0.05),
+            SizedBox(height: height * 0.06),
             Text(
               "Paiement effectué",
               style: GoogleFonts.poppins(
-                fontSize: width * 0.06,
+                fontSize: width * 0.07,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
+                letterSpacing: 0.5,
               ),
             ),
             SizedBox(height: height * 0.02),
             Text(
-              "Votre commande a été\n effectuée avec succès.",
+              "Votre commande a été\neffectuée avec succès.",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: width * 0.045,
                 fontWeight: FontWeight.w400,
-                color: Colors.white,
+                color: Colors.white.withOpacity(0.9),
+                height: 1.5,
               ),
             ),
+            SizedBox(height: height * 0.08),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: width * 0.1),
+              child: ElevatedButton(
+                onPressed: () => Get.toNamed(AppRoutes.HOME),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  minimumSize: Size(double.infinity, height * 0.06),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "Retour à l'accueil",
+                  style: GoogleFonts.poppins(
+                    fontSize: width * 0.04,
+                    fontWeight: FontWeight.w600,
+                    color: btnColorFourth,
+                  ),
+                ),
+              ),
+            ),
+            const Spacer(),
           ],
         ),
       ),

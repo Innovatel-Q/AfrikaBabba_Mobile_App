@@ -67,9 +67,9 @@ class _CartScreenState extends State<CartScreen> with SingleTickerProviderStateM
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
+              children: const [
                 NoPayScreen(),
-                const PayScreen(),
+                PayScreen(),
                DeliveryScreen(),
               ],
             ),

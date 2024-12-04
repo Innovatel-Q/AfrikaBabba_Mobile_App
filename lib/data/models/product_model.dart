@@ -16,13 +16,26 @@ class ProductResponse {
     required this.links,
     required this.meta,
   });
-
+  
   factory ProductResponse.fromJson(Map<String, dynamic> json) =>
       ProductResponse(
         data: List<Product>.from(
-            json["data"].map((x) => Product.fromJson(x)) ?? []),
-        links: Links.fromJson(json["links"]),
-        meta: Meta.fromJson(json["meta"]),
+            (json["data"] ?? []).map((x) => Product.fromJson(x))),
+        links: json["links"] != null 
+            ? Links.fromJson(json["links"])
+            : Links(first: '', last: '', next: ''),
+        meta: json["meta"] != null 
+            ? Meta.fromJson(json["meta"])
+            : Meta(
+                currentPage: 0,
+                from: 0,
+                lastPage: 0,
+                links: [],
+                path: '',
+                perPage: 0,
+                to: 0,
+                total: 0,
+              ),
       );
 
   Map<String, dynamic> toJson() => {
@@ -86,17 +99,43 @@ class Product {
         videoUrl: json["video_url"],
         description: json["description"] ?? '',
         productWeight: (json["product_weight"] ?? 0.0).toDouble(),
-        productDimensions: ProductDimensions.fromJson(json["product_dimensions"]),
+        productDimensions: json["product_dimensions"] != null 
+            ? ProductDimensions.fromJson(json["product_dimensions"])
+            : ProductDimensions(height: 0.0, width: 0.0, length: 0.0),
         status: json["status"] ?? 'inactive',
         available: json["available"] ?? 0,
         createdAt: DateTime.parse(json["created_at"] ?? DateTime.now().toString()),
         updatedAt: DateTime.parse(json["updated_at"] ?? DateTime.now().toString()),
-        shop: Shop.fromJson(json["shop"]),
-        category: Category.fromJson(json["category"]),
+        shop: json["shop"] != null 
+            ? Shop.fromJson(json["shop"])
+            : Shop(
+                id: 0,
+                userId: 0,
+                companyName: '',
+                salesManagerName: '',
+                companyRegistration: '',
+                businessLicense: '',
+                phoneNumber: '',
+                emailAddress: '',
+                balance: '0.00',
+                deadBalance: '0.00',
+                fraisInterne: '0.00',
+                verifiedAt: DateTime.now(),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
+        category: json["category"] != null 
+            ? Category.fromJson(json["category"])
+            : Category(
+                id: 0,
+                name: '',
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
         productMedia: List<ProductMedia>.from(
-            json["product_media"]?.map((x) => ProductMedia.fromJson(x)) ?? []),
+            (json["product_media"] ?? []).map((x) => ProductMedia.fromJson(x))),
         reviews: List<Review>.from(
-            json["reviews"]?.map((x) => Review.fromJson(x)) ?? []),
+            (json["reviews"] ?? []).map((x) => Review.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -161,7 +200,10 @@ class Shop {
   dynamic bankTransferDetails;
   dynamic paypalDetails;
   dynamic westernUnionDetails;
+  String? address;
   String balance;
+  String? description;
+  String? city;
   String deadBalance;
   String fraisInterne;
   dynamic deletedAt;
@@ -178,7 +220,10 @@ class Shop {
     required this.businessLicense,
     required this.phoneNumber,
     required this.emailAddress,
+    this.description,
     this.logo,
+    this.city,
+    this.address,
     this.banner,
     this.bankTransferDetails,
     this.paypalDetails,
@@ -197,9 +242,12 @@ class Shop {
         userId: json["user_id"] ?? 0,
         companyName: json["company_name"] ?? '',
         salesManagerName: json["sales_manager_name"] ?? '',
+        description: json["description"],
         companyRegistration: json["company_registration"] ?? '',
         businessLicense: json["business_license"] ?? '',
         phoneNumber: json["phone_number"] ?? '',
+        city: json["city"] ?? '',
+        address: json["address"],
         emailAddress: json["email_address"] ?? '',
         logo: json["logo"],
         banner: json["banner"],
@@ -226,6 +274,7 @@ class Shop {
         "email_address": emailAddress,
         "logo": logo,
         "banner": banner,
+        "address": address,
         "bank_transfer_details": bankTransferDetails,
         "paypal_details": paypalDetails,
         "western_union_details": westernUnionDetails,
@@ -343,7 +392,20 @@ class Review {
         productId: json["product_id"] ?? 0,
         rating: json["rating"] ?? 0,
         comment: json["comment"] ?? '',
-        user: User.fromJson(json["user"]),
+        user: json["user"] != null 
+            ? User.fromJson(json["user"])
+            : User(
+                id: 0,
+                firstname: '',
+                lastname: '',
+                phoneNumber: '',
+                role: 'CUSTOMER',
+                email: '',
+                emailVerifiedAt: DateTime.now(),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+                status: 0,
+              ),
         createdAt: DateTime.parse(json["created_at"] ?? DateTime.now().toString()),
         updatedAt: DateTime.parse(json["updated_at"] ?? DateTime.now().toString()),
       );
@@ -482,7 +544,7 @@ class Meta {
         from: json["from"] ?? 0,
         lastPage: json["last_page"] ?? 0,
         links: List<Link>.from(
-            json["links"]?.map((x) => Link.fromJson(x)) ?? []),
+            (json["links"] ?? []).map((x) => Link.fromJson(x))),
         path: json["path"] ?? '',
         perPage: json["per_page"] ?? 0,
         to: json["to"] ?? 0,

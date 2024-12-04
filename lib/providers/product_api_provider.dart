@@ -1,18 +1,15 @@
 
 import 'package:afrika_baba/providers/api_provider.dart';
-
-import 'package:dio/dio.dart';
-// import 'package:get/get.dart' as;
+import 'package:get/get.dart';
+import 'package:dio/dio.dart' as dio;
 
 
 
 class ProductApiProvider {
   
-  final  ApiProvider apiProvider =  ApiProvider();
+  final  ApiProvider apiProvider =  Get.find<ApiProvider>();
 
-  // final LocalStorageProvider localStorage = get.Get.find<LocalStorageProvider>();
-
-  Future<Response?> getProducts({int page = 1}) async {
+  Future<dio.Response?> getProducts({int page = 1}) async {
     try {
       final response = await apiProvider.dio.get("/products?page=$page");
        return response;
@@ -21,7 +18,7 @@ class ProductApiProvider {
     }
   }
 
-  Future<Response?> getProductById(int productId) async {
+  Future<dio.Response?> getProductById(int productId) async {
     try {
       final response = await apiProvider.dio.get("/products/$productId");
       return response;
@@ -30,7 +27,7 @@ class ProductApiProvider {
     }
   }
 
-  getComments(int productId) async {
+  Future<dio.Response?> getComments(int productId) async {
     try {
       final response = await apiProvider.dio.get("/reviews");
       return response;
@@ -41,7 +38,7 @@ class ProductApiProvider {
 
 
 
-  Future<Response?>addComment(Map<String, dynamic> data) async {
+  Future<dio.Response?> addComment(Map<String, dynamic> data) async {
     try {
       final response = await apiProvider.dio.post("/reviews", data: data);
       return response;
@@ -50,7 +47,7 @@ class ProductApiProvider {
     }
   }
 
-  Future<Response?> editComment(int commentId, Map<String, dynamic> data) async {
+  Future<dio.Response?> editComment(int commentId, Map<String, dynamic> data) async {
     try {
       final response = await apiProvider.dio.post("reviews/update/$commentId", data: data);
       return response;
@@ -59,7 +56,7 @@ class ProductApiProvider {
     }
   }
 
-  Future<Response?> deleteComment(int commentId) async {
+  Future<dio.Response?> deleteComment(int commentId) async {
     try {
       final response = await apiProvider.dio.delete("/reviews/$commentId");
       return response;
@@ -69,7 +66,7 @@ class ProductApiProvider {
   }
 
   // get all categories
-  Future<Response?> getCategories({int page = 1}) async {
+  Future<dio.Response?> getCategories({int page = 1}) async {
     try {
       final response = await apiProvider.dio.get("/categories?page=$page");
       return response;
@@ -78,7 +75,7 @@ class ProductApiProvider {
     }
   }
 
-  serachAutoCompleteProduct(String query) async {
+  Future<dio.Response?> serachAutoCompleteProduct(String query) async {
     try {
       final response = await apiProvider.dio.post("/products/auto", data: {"query": query});
       return response;
@@ -87,7 +84,7 @@ class ProductApiProvider {
     }
   }
 
-  Future<Response?> searchProduct(String? name, int? category, {int page = 1}) async {
+  Future<dio.Response?> searchProduct(String? name, int? category, {int page = 1}) async {
     try {
       Map<String, dynamic> data = {};
       if (category != null) {

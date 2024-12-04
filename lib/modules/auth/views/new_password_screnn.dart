@@ -46,12 +46,12 @@ class NewPasswordScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
               
-                CustomInputField(
+                const CustomInputField(
                   hintText: 'Mot de passe',
                   obscureText: true,
                 ),
                 const SizedBox(height: 20),
-                CustomInputField(
+                const CustomInputField(
                   hintText: 'Confirmer votre mot de passe',
                   obscureText: true,
                 ),

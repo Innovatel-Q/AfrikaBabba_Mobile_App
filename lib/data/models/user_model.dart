@@ -20,6 +20,7 @@ class User {
     this.address,
     required this.email,
     required this.password,
+    // ignore: non_constant_identifier_names
     required this.avatar_url,
     required this.passwordConfirmation,
     required this.role,
@@ -57,5 +58,28 @@ class User {
       'role': role,
       'country': country,
     };
+  }
+
+  User copyWith({
+    String? firstname,
+    String? lastname,
+    String? address,
+    String? phoneNumber,
+    String? country,
+    
+  }) {
+    return User(
+      id: this.id,
+      firstname: this.firstname,
+      lastname: this.lastname,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      address: address ?? this.address,
+      email: this.email,
+      password: this.password,
+      avatar_url: this.avatar_url,
+      passwordConfirmation: this.passwordConfirmation,
+      role: this.role,
+      country: country ?? this.country,
+    );
   }
 }

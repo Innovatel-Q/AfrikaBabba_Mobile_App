@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ForgetPasswordScreen extends StatelessWidget {
+  const ForgetPasswordScreen({super.key});
+
 
   @override
 
@@ -50,7 +52,7 @@ class ForgetPasswordScreen extends StatelessWidget {
                     color: textColor,
                 )),
                 const SizedBox(height: 30),
-                CustomInputField(
+                const CustomInputField(
                   hintText: 'Votre e-mail',
                   obscureText: true,
                 ),

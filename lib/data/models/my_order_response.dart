@@ -1,3 +1,5 @@
+import 'package:afrika_baba/data/models/product_model.dart';
+
 class MyOrderResponse {
   List<Order> orders;
   Links? links;
@@ -28,6 +30,7 @@ class Order {
   List<dynamic> refundRequests;
   String? createdAt;
   String? updatedAt;
+  String? deletedAt;
 
   Order({
     required this.id,
@@ -43,6 +46,7 @@ class Order {
     required this.refundRequests,
     this.createdAt,
     this.updatedAt,
+    this.deletedAt,
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
@@ -60,6 +64,7 @@ class Order {
       refundRequests: json['refund_requests'] ?? [],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
+      deletedAt: json['deleted_at'],
     );
   }
 }
@@ -121,7 +126,7 @@ class OrderItem {
   int id;
   int orderId;
   String orderItemsCode;
-  int productId;
+  Product product;
   int quantity;
   int shopId;
   int forwarderId;
@@ -138,7 +143,7 @@ class OrderItem {
     required this.id,
     required this.orderId,
     required this.orderItemsCode,
-    required this.productId,
+    required this.product,
     required this.quantity,
     required this.shopId,
     required this.forwarderId,
@@ -157,7 +162,7 @@ class OrderItem {
       id: json['id'] ?? 0,
       orderId: json['order_id'] ?? 0,
       orderItemsCode: json['order_items_code'] ?? '',
-      productId: json['product_id'] ?? 0,
+      product: Product.fromJson(json['product']),
       quantity: json['quantity'] ?? 0,
       shopId: json['shop_id'] ?? 0,
       forwarderId: json['forwarder_id'] ?? 0,

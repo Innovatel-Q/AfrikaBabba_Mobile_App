@@ -7,28 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:country_picker/country_picker.dart';
 
-class DeliveryAddressScreen extends StatefulWidget {
-  const DeliveryAddressScreen({super.key});
-  @override
-  State<DeliveryAddressScreen> createState() => _DeliveryAddressScreenState();
-}
+class DeliveryAddressScreen extends GetView<UserController> {
 
-class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
-   final TextEditingController addressController = TextEditingController();
+  DeliveryAddressScreen({super.key});
+
+  final TextEditingController addressController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController countryController = TextEditingController();
   final AuthController authController = Get.find<AuthController>();
 
-
-  // Country? _selectedCountry;
+  final List<String> countryAvailableList = ["CIV","SN"];
+  final RxString selectedCountry = "".obs;
 
   @override
   Widget build(BuildContext context) {
 
-    addressController.text =  authController.userData.value!.address ?? '';
+    selectedCountry.value = authController.userData.value?.country ?? '';
+    addressController.text = authController.userData.value!.address ?? '';
     phoneController.text = authController.userData.value?.phoneNumber ?? '';
-    final UserController userController = Get.find<UserController>();
+    countryController.text = authController.userData.value?.country ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -50,7 +48,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         ),
         centerTitle: true,
       ),
-      backgroundColor: Colors.grey[200],
+     backgroundColor: backgroundAppColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -58,58 +56,40 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 30),
-                // GestureDetector(
-                //   onTap: () {
-                //     showCountryPicker(
-                //       context: context,
-                //       showPhoneCode: false, 
-                //       onSelect: (Country country) {
-                //         setState(() {
-                //           _selectedCountry = country;
-                //         });
-                //       },
-                //     );
-                //   },
-                //   child: Container(
-                //     padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(10),
-                //       border: Border.all(color: Colors.grey),
-                    
-                //     ),
-                //     child: Row(
-                //       children: [
-                //         if (_selectedCountry != null)
-                //           Text(
-                //             '${_selectedCountry!.flagEmoji} ${_selectedCountry!.name}',
-                //             style: GoogleFonts.poppins(
-                //               fontSize: 16,
-                //               color: Colors.black87,
-                //             ),
-                //           )
-                //         else
-                //           Text(
-                //             'Sélectionner votre pays',
-                //             style: GoogleFonts.poppins(
-                //               fontSize: 16,
-                //               color: Colors.grey,
-                //             ),
-                //           ),
-                //         const Spacer(),
-                //         const Icon(Icons.arrow_drop_down, color: Colors.grey),
-                //       ],
-                //     ),
-                //   ),
-                // ),
                 const SizedBox(height: 20),
                 CustomInputFieldWithLabel(hintText: 'Adresse', label: 'Adresse', controller: addressController),
+                const SizedBox(height: 20),
+                Obx(() => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: DropdownButtonFormField<String>(
+                    value: selectedCountry.value.isEmpty ? null : selectedCountry.value,
+                    decoration: const InputDecoration(
+                      labelText: 'Code pays',
+                      border: InputBorder.none,
+                    ),
+                    items: countryAvailableList.map((String country) {
+                      return DropdownMenuItem<String>(
+                        value: country,
+                        child: Text(country),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      selectedCountry.value = newValue ?? '';
+                      countryController.text = newValue ?? '';
+                    },
+                  ),
+                )),
                 const SizedBox(height: 20),
                 CustomInputFieldWithLabel(hintText: 'Numero mobile', label: 'Numero mobile', controller: phoneController),
                 const SizedBox(height: 30),
                 Obx((){
-                  if (userController.isLoading.value) {
-                    return   const Center(child: SpinKitFadingCircle(
+                  if (controller.isLoading.value) {
+                    return   const Center(child: SpinKitChasingDots(
                       color: btnColor,
                       size: 50.0,
                     ));
@@ -119,10 +99,14 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                   color: btnColorSecond,
                   size: 13,
                   onPressed: () {
-                    if(addressController.text.isEmpty || phoneController.text.isEmpty){
-                      Get.snackbar('Erreur', 'Veuillez remplir tous les ch  amps', backgroundColor: Colors.red, colorText: Colors.white);
+                    if(addressController.text.isEmpty || phoneController.text.isEmpty || countryController.text.isEmpty){
+                      Get.snackbar('Opps', 'Veuillez remplir tous les champs', backgroundColor: Colors.red, colorText: Colors.white);
                     }else{
-                      userController.editAddress(addressController.text, phoneController.text);
+                      if(!countryAvailableList.contains(countryController.text)){
+                        Get.snackbar('Opps', 'Veuillez saisir une code de pays valide (SN,CIV)', backgroundColor: Colors.red, colorText: Colors.white);
+                        return;
+                      }
+                      controller.editAddress(addressController.text, phoneController.text,countryController.text);
                     }
                   },
                   );

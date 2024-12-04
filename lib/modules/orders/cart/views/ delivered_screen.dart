@@ -66,7 +66,8 @@ class DeliveryScreen extends StatelessWidget {
                       itemCount: orderController.myOrdersDelivered.length,
                       itemBuilder: (context, index) {
                         final order = orderController.myOrdersDelivered[index];
-                        return OrderCard(order: order, width: width, height: height);
+                        return OrderCard(
+                            order: order, width: width, height: height);
                       },
                     ),
                   );
@@ -80,91 +81,114 @@ class DeliveryScreen extends StatelessWidget {
   }
 }
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final Order order;
   final double width;
   final double height;
 
   const OrderCard({
-    Key? key,
+    super.key,
     required this.order,
     required this.width,
     required this.height,
-  }) : super(key: key);
+  });
+
+  @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> {
+  @override
+  void initState() {
+    super.initState();
+    // Préchargement des images au chargement
+    final homeController = Get.find<HomeController>();
+    for (var item in widget.order.orderItems) {
+      homeController.getProductImageById(item.product.id);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final homeController = Get.find<HomeController>();
+
     return Card(
-      margin: EdgeInsets.only(bottom: height * 0.02),
+      margin: EdgeInsets.only(bottom: widget.height * 0.02),
       child: Padding(
-        padding: EdgeInsets.all(width * 0.03),
+        padding: EdgeInsets.all(widget.width * 0.03),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-        
             SizedBox(
-              height: height * 0.1,
+              height: widget.height * 0.1,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: order.orderItems.length,
+                itemCount: widget.order.orderItems.length,
                 itemBuilder: (context, index) {
-                  final item = order.orderItems[index];
+                  final item = widget.order.orderItems[index];
                   return Container(
-                    margin: EdgeInsets.only(right: width * 0.02),
-                    width: width * 0.2,
+                    margin: EdgeInsets.only(right: widget.width * 0.02),
+                    width: widget.width * 0.2,
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: FutureBuilder<String?>(
-                        future: homeController.getProductImageById(item.productId),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.done) {
-                            return CachedNetworkImage(
-                              imageUrl: snapshot.data ?? 'https://images.pexels.com/photos/4279153/pexels-photo-4279153.jpeg?auto=compress&cs=tinysrgb&w=800',
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => const SpinKitWave(
-                                color: Colors.black,
-                                size: 20,
-                              ),
-                              errorWidget: (context, url, error) => const Icon(Icons.error),
-                            );
-                          } else {
-                            return const SpinKitWave(
-                              color: Colors.black,
-                              size: 20,
-                            );
-                          }
-                        },
-                      ),
+                    child: FutureBuilder<String?>(
+                      future:
+                          homeController.getProductImageById(item.product.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const SpinKitWave(
+                            color: Color.fromRGBO(0, 0, 0, 1),
+                            size: 20,
+                          );
+                        } else if (snapshot.hasError || !snapshot.hasData) {
+                          return const Icon(Icons.error);
+                        }
+                        return CachedNetworkImage(
+                          imageUrl: snapshot.data!,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const SpinKitWave(
+                            color: Colors.black,
+                            size: 20,
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
+                        );
+                      },
                     ),
                   );
                 },
               ),
             ),
-            SizedBox(height: height * 0.02),
+            SizedBox(height: widget.height * 0.02),
             // Informations sur la commande
             Text(
-              'Commande #${order.orderNumber}',
+              'Commande #${widget.order.orderNumber}',
               style: GoogleFonts.poppins(
-                fontSize: width * 0.04,
+                fontSize: widget.width * 0.04,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: height * 0.01),
-            buildInfoRow("Date", DateFormat('dd/MM/yyyy').format(DateTime.parse(order.createdAt.toString())), width),
-            buildInfoRow("Prix total", '${order.totalPrice} FCFA', width),
-            buildInfoRow("Statut", order.status, width, isStatus: true),
+            SizedBox(height: widget.height * 0.01),
+            buildInfoRow(
+                "Date",
+                DateFormat('dd/MM/yyyy')
+                    .format(DateTime.parse(widget.order.createdAt.toString())),
+                widget.width),
+            buildInfoRow(
+                "Prix total", '${widget.order.totalPrice} FCFA', widget.width),
+            buildInfoRow("Statut", "Livré", widget.width,
+                isStatus: true),
           ],
         ),
       ),
     );
   }
 
-  Widget buildInfoRow(String label, String value, double width, {bool isStatus = false}) {
+  Widget buildInfoRow(String label, String value, double width,
+      {bool isStatus = false}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: width * 0.01),
       child: Row(
