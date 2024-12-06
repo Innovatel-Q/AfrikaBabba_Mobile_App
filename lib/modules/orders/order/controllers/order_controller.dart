@@ -6,6 +6,7 @@ import 'package:afrika_baba/providers/local_storage_provider.dart';
 import 'package:afrika_baba/providers/order_api_provider.dart';
 import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class OrderController extends GetxController {
@@ -137,13 +138,11 @@ class OrderController extends GetxController {
             'frais_interne': e.product.productWeight * e.quantity.value * double.parse(e.product.shop.fraisInterne)
         }).toList();
       isLoadingCreate.value = true;
-      // Calculer le montant total final (commande + livraison)
       final finalTotalAmount = totalOrder.value + totalDeliveryCost.value;
-      
       final response = await orderApiProvider.createOrder(
-        deliveryMethod: deliveryMode.value.toString(),
+        deliveryMethod: deliveryMode.value.toString() == "1" ? "AIR" : "SEA",
         deliveryCost: totalDeliveryCost.value.toString(),
-        totalPrice: finalTotalAmount.toString(), // Utiliser le montant total final
+        totalPrice: finalTotalAmount.toString(),
         orderItems: orderItems
       );
       if (response?.data != null) {
@@ -156,7 +155,10 @@ class OrderController extends GetxController {
       }
       isLoadingCreate.value = false;
     } catch (e) {
-      print('Error creating order: $e');
+      Get.snackbar('Oups!', 'Une erreur est survenue lors de la création de votre commande, veuillez réessayer plus tard.', 
+      colorText: Colors.white,
+      backgroundColor: Colors.red);
+      print('Error creating order: $e.toString()');
       isLoadingCreate.value = false;
     }
   }

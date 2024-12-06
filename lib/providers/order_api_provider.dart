@@ -17,9 +17,7 @@ class OrderApiProvider{
       throw Exception('Erreur lors de la récupération du coût de livraison : $e');
     }
   }
-
- 
-
+  
   Future<dio.Response?> createOrder({
     required String deliveryMethod,
     required String deliveryCost,
@@ -27,6 +25,12 @@ class OrderApiProvider{
     required List<Map<String, dynamic>> orderItems,
   }) async {
     try {
+      print({
+        'delivery_method': deliveryMethod,
+        'delivery_cost': deliveryCost,
+        'total_price': totalPrice,
+        'order_items': orderItems,
+      });
       final response = await apiProvider.dio.post('/orders', data: {
         'delivery_method': deliveryMethod,
         'delivery_cost': deliveryCost,
