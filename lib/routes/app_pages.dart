@@ -44,7 +44,7 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.HOME,
-      page: () =>  const HomePage(),
+      page: () =>   HomePage(),
       bindings: [
         HomeBinding(),
         AuthBinding(),

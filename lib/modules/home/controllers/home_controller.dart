@@ -76,6 +76,12 @@ class HomeController extends GetxController {
     try {
       final response = await productApiProvider.getCategories(page: 1);
       if (response?.statusCode == 200 && response?.data != null) {
+        // categories.value = [
+        //   Category(id: 1, name: "Industriel", createdAt: DateTime.now(), updatedAt: DateTime.now()),
+        //   Category(id: 2, name: "Matières premières", createdAt: DateTime.now(), updatedAt: DateTime.now()),
+        //   Category(id: 3, name: "", createdAt: DateTime.now(), updatedAt: DateTime.now()),
+        //   Category(id: 4, name: "", createdAt: DateTime.now(), updatedAt: DateTime.now()),
+        // ];
         categories.addAll((response?.data['data'] as List)
             .map((element) => Category.fromJson(element)));
       }

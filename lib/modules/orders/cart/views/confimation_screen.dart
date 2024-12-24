@@ -1,5 +1,7 @@
+import 'package:afrika_baba/main.dart';
 import 'package:afrika_baba/modules/auth/controllers/auth_controller.dart';
 import 'package:afrika_baba/modules/orders/order/controllers/order_controller.dart';
+import 'package:afrika_baba/modules/payments/views/happy_pay.dart';
 import 'package:afrika_baba/providers/local_storage_provider.dart';
 import 'package:afrika_baba/routes/app_routes.dart';
 import 'package:afrika_baba/shared/themes/chart_color.dart';
@@ -12,7 +14,6 @@ import '../controllers/cart_controller.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ConfirmationScreen extends GetView<OrderController> {
-
   final LocalStorageProvider localStorage = Get.find<LocalStorageProvider>();
   final AuthController authController = Get.find<AuthController>();
   final CartController cartController = Get.find<CartController>();
@@ -20,10 +21,8 @@ class ConfirmationScreen extends GetView<OrderController> {
 
   ConfirmationScreen({super.key});
 
- 
   @override
   Widget build(BuildContext context) {
-   
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
     final textScaleFactor = width / 375;
@@ -37,7 +36,8 @@ class ConfirmationScreen extends GetView<OrderController> {
             backgroundColor: Colors.white.withOpacity(0.0),
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+              icon: const Icon(Icons.arrow_back_ios,
+                  color: Colors.black, size: 20),
               onPressed: () => Get.back(),
             ),
             title: Text(
@@ -58,7 +58,8 @@ class ConfirmationScreen extends GetView<OrderController> {
                     child: Column(
                       children: [
                         Container(
-                          margin: EdgeInsets.symmetric(horizontal: 16 * paddingScaleFactor),
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 16 * paddingScaleFactor),
                           padding: EdgeInsets.all(16 * paddingScaleFactor),
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -83,7 +84,8 @@ class ConfirmationScreen extends GetView<OrderController> {
                               ),
                               SizedBox(height: 16 * paddingScaleFactor),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Produits",
@@ -94,18 +96,19 @@ class ConfirmationScreen extends GetView<OrderController> {
                                     ),
                                   ),
                                   Obx(() => Text(
-                                    "${cartController.totalProduct} article${cartController.totalProduct > 1 ? 's' : ''}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14 * textScaleFactor,
-                                      fontWeight: FontWeight.w500,
-                                      color: textColor,
-                                    ),
-                                  )),
+                                        "${cartController.totalProduct} article${cartController.totalProduct > 1 ? 's' : ''}",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14 * textScaleFactor,
+                                          fontWeight: FontWeight.w500,
+                                          color: textColor,
+                                        ),
+                                      )),
                                 ],
                               ),
                               SizedBox(height: 20 * paddingScaleFactor),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Poids total",
@@ -116,18 +119,19 @@ class ConfirmationScreen extends GetView<OrderController> {
                                     ),
                                   ),
                                   Obx(() => Text(
-                                    "${controller.getTotalWeight().toStringAsFixed(2)} kg",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14 * textScaleFactor,
-                                      fontWeight: FontWeight.w500,
-                                      color: textColor,
-                                    ),
-                                  )),
+                                        "${controller.getTotalWeight().toStringAsFixed(2)} kg",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14 * textScaleFactor,
+                                          fontWeight: FontWeight.w500,
+                                          color: textColor,
+                                        ),
+                                      )),
                                 ],
                               ),
                               SizedBox(height: 20 * paddingScaleFactor),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Frais de livraison",
@@ -138,18 +142,19 @@ class ConfirmationScreen extends GetView<OrderController> {
                                     ),
                                   ),
                                   Obx(() => Text(
-                                    "${controller.totalDeliveryCost.value.toStringAsFixed(0)} FCFA",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14 * textScaleFactor,
-                                      fontWeight: FontWeight.w500,
-                                      color: textColor,
-                                    ),
-                                  )),
+                                        "${controller.totalDeliveryCost.value.toStringAsFixed(0)} FCFA",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14 * textScaleFactor,
+                                          fontWeight: FontWeight.w500,
+                                          color: textColor,
+                                        ),
+                                      )),
                                 ],
                               ),
                               Divider(height: 32 * paddingScaleFactor),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Total à payer",
@@ -160,13 +165,13 @@ class ConfirmationScreen extends GetView<OrderController> {
                                     ),
                                   ),
                                   Obx(() => Text(
-                                    "${(controller.totalOrder.value + controller.totalDeliveryCost.value).toStringAsFixed(0)}FCFA",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 16 * textScaleFactor,
-                                      fontWeight: FontWeight.w500,
-                                      color: btnColor,
-                                    ),
-                                  )),
+                                        "${(controller.totalOrder.value + controller.totalDeliveryCost.value).toStringAsFixed(0)}FCFA",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16 * textScaleFactor,
+                                          fontWeight: FontWeight.w500,
+                                          color: btnColor,
+                                        ),
+                                      )),
                                 ],
                               ),
                             ],
@@ -199,9 +204,11 @@ class ConfirmationScreen extends GetView<OrderController> {
                                 ),
                               ),
                               SizedBox(height: 16 * paddingScaleFactor),
-                              _buildPaymentOption('paypal', 'PayPal', 'payment'),
-                              SizedBox(height: 12 * paddingScaleFactor),
-                              _buildPaymentOption('orange', 'Orange Money', 'phone_android'),
+                              authController.userData.value?.country == 'SN'
+                                  ? _buildPaymentOption('happyPay', 'Happy Pay',
+                                      'assets/logo-happy-pay.png')
+                                  : _buildPaymentOption('cinetpay', 'PayDunya',
+                                      'assets/logo-cinetpay.png'),
                             ],
                           ),
                         ),
@@ -215,17 +222,18 @@ class ConfirmationScreen extends GetView<OrderController> {
           ),
         ),
         // Loader overlay
-        Obx(() => controller.isLoadingCreate.value
-          ? Container(
-              color: Colors.black.withOpacity(0.5),
-              child: const Center(
-                child: SpinKitThreeBounce(
-                  color: Colors.white,
-                  size: 50.0,
-                ),
-              ),
-            )
-          : const SizedBox.shrink(),
+        Obx(
+          () => controller.isLoadingCreate.value
+              ? Container(
+                  color: Colors.black.withOpacity(0.5),
+                  child: const Center(
+                    child: SpinKitThreeBounce(
+                      color: Colors.white,
+                      size: 50.0,
+                    ),
+                  ),
+                )
+              : const SizedBox.shrink(),
         ),
       ],
     );
@@ -233,50 +241,64 @@ class ConfirmationScreen extends GetView<OrderController> {
 
   Widget _buildPaymentOption(String method, String title, String iconData) {
     return Obx(() => InkWell(
-      onTap: () => selectedPaymentMethod.value = method,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: selectedPaymentMethod.value == method ? btnColor : Colors.grey[300]!,
-            width: 2,
+          onTap: () => selectedPaymentMethod.value = method,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: selectedPaymentMethod.value == method
+                    ? btnColor
+                    : Colors.grey[300]!,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              color: selectedPaymentMethod.value == method
+                  ? btnColor.withOpacity(0.1)
+                  : Colors.white,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: selectedPaymentMethod.value == method
+                        ? btnColor.withOpacity(0.1)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: method == 'cinetpay'
+                      ? Image.asset(
+                          'assets/logo-cinetpay.png',
+                          scale: 30,
+                        )
+                      : Image.asset(
+                          'assets/logo-happy-pay.png',
+                          scale: 8,
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w500,
+                    color: selectedPaymentMethod.value == method
+                        ? btnColor
+                        : Colors.black,
+                  ),
+                ),
+                const Spacer(),
+                if (selectedPaymentMethod.value == method)
+                  const Icon(Icons.check_circle, color: btnColor),
+              ],
+            ),
           ),
-          borderRadius: BorderRadius.circular(12),
-          color: selectedPaymentMethod.value == method ? btnColor.withOpacity(0.1) : Colors.white,
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: selectedPaymentMethod.value == method ? btnColor.withOpacity(0.1) : Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: method == 'paypal' 
-                  ? const Icon(Icons.payment, color: Colors.blue)
-                  : const Icon(Icons.phone_android, color: Colors.orange),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w500,
-                color: selectedPaymentMethod.value == method ? btnColor : Colors.black,
-              ),
-            ),
-            const Spacer(),
-            if (selectedPaymentMethod.value == method)
-              const Icon(Icons.check_circle, color: btnColor),
-          ],
-        ),
-      ),
-    ));
+        ));
   }
 
   Widget _buildPaymentButton(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final paddingScaleFactor = height / 812;
-    
+
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: 16 * paddingScaleFactor,
@@ -292,11 +314,11 @@ class ConfirmationScreen extends GetView<OrderController> {
         ],
       ),
       child: CustomButton(
-            text: "Payer maintenant",
-            onPressed: _processPayment,
-            color: btnColorFourth,
-            elevation: 0,
-          ),
+        text: "Payer maintenant",
+        onPressed: _processPayment,
+        color: btnColorFourth,
+        elevation: 0,
+      ),
     );
   }
 
@@ -306,21 +328,31 @@ class ConfirmationScreen extends GetView<OrderController> {
       return;
     }
 
+    int tid = DateTime.now().millisecondsSinceEpoch;
+
+ if (selectedPaymentMethod.value == 'happyPay') {
+      Get.to(HappyPaymentsScreen(
+        orderId: '${tid}',
+        amount:
+            controller.totalOrder.value + controller.totalDeliveryCost.value,
+      ));
+      return;
+    }
+
     if (authController.userData.value?.address == null ||
         authController.userData.value!.address!.isEmpty) {
       Get.dialog(
         CustomAlertDialogue(
           title: 'Alerte',
-          content:
-          'Veuillez renseigner une adresse avant de continuer',
+          content: 'Veuillez renseigner une adresse avant de continuer',
           canceledText: 'Non',
           confirmationText: 'Oui',
           canceledFunction: () {
             Get.back();
           },
-          confirmationFunction: (){
+          confirmationFunction: () {
             Get.back();
-           Get.toNamed(AppRoutes.DELIVERY_ADRESS_SCREEN);
+            Get.toNamed(AppRoutes.DELIVERY_ADRESS_SCREEN);
           },
         ),
       );
@@ -332,7 +364,7 @@ class ConfirmationScreen extends GetView<OrderController> {
         CustomAlertDialogue(
           title: 'Alerte',
           content:
-          'Êtes-vous toujours dans votre pays de résidence ? Si oui, confirmez. '
+              'Êtes-vous toujours dans votre pays de résidence ? Si oui, confirmez. '
               'Sinon, veuillez vous rendre dans les paramètres pour changer votre pays de résidence.',
           canceledText: 'Non',
           confirmationText: 'Oui',
@@ -346,7 +378,8 @@ class ConfirmationScreen extends GetView<OrderController> {
         ),
       );
     } catch (e) {
-      Get.snackbar('Erreur', 'Une erreur est survenue lors du traitement du paiement');
+      Get.snackbar(
+          'Erreur', 'Une erreur est survenue lors du traitement du paiement');
     }
   }
 }

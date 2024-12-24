@@ -11,7 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 class HomePage extends GetView<HomeController> {
-  const HomePage({super.key});
+   HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +148,11 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
+  List<String> cat = [ "Industriel", "Matières premières",
+    "Sport & Improvement", "Fashion & Beauty",
+    "Home Décor",
+   "Commercial Equipment & Machine", ];
+
   Widget _buildCategoriesSection(double screenHeight, double screenWidth) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +194,9 @@ class HomePage extends GetView<HomeController> {
                           null, category.id);
                     },
                     icon: _getCategoryIcon(category.name),
-                    label: Text(
+                    label:
+
+                    Text(
                       category.name.toLowerCase(),
                       style: GoogleFonts.poppins(
                         color: btnColor,
