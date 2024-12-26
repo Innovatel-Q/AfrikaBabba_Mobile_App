@@ -71,7 +71,7 @@ class _HappyPaymentsScreenState extends State<HappyPaymentsScreen> {
 </head>
 <body>
     <form id="paymentForm" action="https://happypay-dev.com/api/happy-pay/payment/init" method="post">
-        <input type="hidden" name="amount" value="20">
+        <input type="hidden" name="amount" value="${widget.amount}">
         <input type="hidden" name="reference" value="${widget.orderId}">
         <input type="hidden" name="callbackUrl" value="https://afrikababaa-571dedf1e98c.herokuapp.com/api/happyPay">
         <button id="submitButton" type="submit" style="width: 100%; padding: 10px; font-size: 16px; background: green; color: white; border: none; border-radius: 4px;">Submit</button>
